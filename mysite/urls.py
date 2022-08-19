@@ -15,16 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from cookbook.views import meal_plan_detail_view, home_view
+from cookbook.views import meal_plan_detail_view, home_view, grocery_list_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^$',
-    home_view,
-    name="home"),
+        home_view,
+        name="home"),
     re_path(r'^MealPlans/(?P<rcid>\d+)/$',
-            meal_plan_detail_view,
-            name="mp_detail"),
+        meal_plan_detail_view,
+        name="mp_detail"),
+    re_path(r'^GroceryList/(?P<rcid>\d+)/$',
+        grocery_list_view,
+        name="grocery_shopping"),
     # re_path(r'^category/(?P<category_id>\d+)/$',
     #         cat_view,
     #         name="blog_cat")

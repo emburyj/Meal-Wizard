@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block content %}
+<h1>
+    This is the grocery shopping list view!
+</h1>
+<h1>
+    <a href="{% url 'mp_detail' rcid %}">Switch to Meal Plan Detail View!</a>
+</h1>
+
+<h2>
+    This is what to buy at the grocery store:
+</h2>
+{% for key, val in groceries.items %}
+    <li>{{ key }} {{ val }}</li>
+{% endfor %}
+{% endblock %}

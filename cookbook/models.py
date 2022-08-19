@@ -34,3 +34,16 @@ class RecipeCollection(models.Model):
 class MealPlan(models.Model):
     rec_col = models.ForeignKey(RecipeCollection, on_delete=models.CASCADE)
     rid = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+
+def get_shopping_list(rc):
+    mp_query = MealPlan.objects.filter(rec_col__exact=rc)
+    ing_dict = {}
+    for item in mp_query:
+        cb_query = Cookbook.objects.filter(rec__exact=item.rid)
+        for foo in cb_query:
+            if foo.ing in ing_dict:
+                ing_dict[foo.ing] = ing_dict[foo.ing] + foo.qty
+            else:
+                ing_dict.setdefault(foo.ing, foo.qty)
+    return ing_dict
+
