@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block content %}
+
+<h1>
+    This is the Meal Plan Detail View!
+</h1>
+
+{% for key, val in recipes_ingredients.items %}
+    <h2>
+        <a href="{{key.source}}">{{ key }}</a>
+    </h2>
+    {% for ing, qty in val.items %}
+
+        <li>
+            {{ ing }} {{ qty }}
+        </li>
+
+    {% endfor %}
+{% endfor %}
+
+{% endblock %}

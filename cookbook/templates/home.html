@@ -1,0 +1,31 @@
+{% extends "base.html" %}{% block content %}
+<h1>
+    This is the home page!
+</h1>
+<h1>
+    Create new meal plan!
+
+</h1>
+
+<h1>
+    These are your meal plans so far:
+</h1>
+
+    {% comment %}Create a button here{% endcomment %}
+{% for key, val in MP_Recs.items %}
+    <h2>
+        <a href="{% url 'mp_detail' key.rcid %}">Meal Plan for week of {{ key.created_date.date }}</a>
+    </h2>
+        <h3>
+            Meals for the week:
+
+    {% for item in val %}
+        <li>
+            {{ item.name }}
+        </li>
+    {% endfor %}
+        </h3>
+{% endfor %}
+    {% comment %}Create a for block for listing meal plans in existence{% endcomment %}
+
+{% endblock %}
