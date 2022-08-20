@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}
+<h1>Create your meal plan here!
+</h1>
+<form action="" method="post">
+    {% csrf_token %}
+    {% for item in form %}
+        {{ item.as_p }}
+
+    {% endfor %}
+    <div class="submit">
+        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+    </div>
+</form>
+{% endblock %}
