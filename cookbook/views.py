@@ -3,10 +3,11 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import RequestContext, loader
 from cookbook.models import Ingredient, Recipe, Cookbook, RecipeCollection, MealPlan, User
 from cookbook.forms import *
+from django.utils.dateparse import parse_date
 
 # Create your views here.
 def home_view(request):
-    rec_coll_query = RecipeCollection.objects.all()
+    rec_coll_query = RecipeCollection.objects.all().order_by('-created_date')
     mealplan_recipes = {}
     for item in rec_coll_query:
         rec_query = MealPlan.objects.filter(rec_col__exact=item)
@@ -18,10 +19,12 @@ def home_view(request):
 def create_meal_plan_view(response):
     recs_all_q = Recipe.objects.all() # query of all recipe objects
     recs_all = [x for x in recs_all_q]
+    recs_ings = get_recs_ings(recs_all)
     me = User.objects.get(username='josh')
-    form = []
+    prefix = '/cookbook/static/'
     if response.method == "POST":
-        new_rc_obj = RecipeCollection(author=me)
+        start_date = parse_date(response.POST['date'])
+        new_rc_obj = RecipeCollection(author=me, created_date=start_date)
         new_rc_obj.save()
         for i in range(0, len(recs_all)):
             if recs_all[i].name in response.POST:
@@ -29,11 +32,18 @@ def create_meal_plan_view(response):
                     new_mp.save()
         return HttpResponseRedirect(f"/Meal-Plans/{new_rc_obj.rcid}")
     else:
+        dateform = new_rc_date_form()
+        recs_ings_checkform = {}
         for i in range(0, len(recs_all)):
-            form.append(new_recipe_collection_form())
-            form[i].fields[recs_all[i].name] = form[i].fields["box"]
-            del(form[i].fields["box"])
-    return render(response, 'create_mp.html', {'form': form})
+            checkform = new_recipe_collection_form()
+            checkform.fields[recs_all[i].name] = checkform.fields["box"]
+            del(checkform.fields["box"])
+            recs_ings_checkform[checkform] = recs_ings[recs_all[i]]
+    return render(response,
+     'create_mp.html',
+      {'dateform': dateform,
+       'checkform': recs_ings_checkform,
+       'admin_media_prefix': prefix})
 
 def meal_plan_detail_view(request, rcid):
     rc = RecipeCollection.objects.get(pk=rcid) # this gives you the RC object

@@ -22,7 +22,7 @@ class CookbookAdmin(admin.ModelAdmin):
 
 @admin.register(RecipeCollection)
 class RecipeCollectionAdmin(admin.ModelAdmin):
-    fieldsets = [(None, {'fields': ('author',)})]
+    fieldsets = [(None, {'fields': ('author','created_date')})]
     list_display = ('rcid', 'author', 'created_date')
 
 

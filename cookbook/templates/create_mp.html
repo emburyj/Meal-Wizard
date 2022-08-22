@@ -1,11 +1,28 @@
 {% extends "base.html" %}{% block content %}
+<head>
+{% load i18n static%}
+<link rel="stylesheet" type="text/css" href="/static/base.css" />
+<link rel="stylesheet" type="text/css" href="/static/widgets.css" />
+<script type="text/javascript" src="/jsi18n/"></script>
+<script type="text/javascript" src="/static/core.js"></script>
+<script type="text/javascript" src="/static/calendar.js"></script>
+<script type="text/javascript" src="/static/admin/DateTimeShortcuts.js"></script>
+<script type="text/javascript" src="/static/admin/RelatedObjectLookups.js"></script>
+</head>
 <h1>Create your meal plan here!
 </h1>
 <form action="" method="post">
     {% csrf_token %}
-    {% for item in form %}
-        {{ item.as_p }}
-
+    {{ dateform.as_p }}
+    {% for key, val in checkform.items %}
+        <p>
+            {{ key }}
+            {% for ing, qty in val.items %}
+                <li>
+                    {{ qty }} {{ ing }}
+                </li>
+        {% endfor %}
+        </p>
     {% endfor %}
     <div class="submit">
         <button type="submit" class="btn btn-primary btn-lg">Submit</button>

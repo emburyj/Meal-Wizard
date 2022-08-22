@@ -29,7 +29,7 @@ class Cookbook(models.Model):
 class RecipeCollection(models.Model):
     rcid = models.AutoField(primary_key=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateField()
 
 class MealPlan(models.Model):
     rec_col = models.ForeignKey(RecipeCollection, on_delete=models.CASCADE)
