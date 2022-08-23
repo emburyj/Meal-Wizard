@@ -6,14 +6,19 @@
 <script type="text/javascript" src="/jsi18n/"></script>
 <script type="text/javascript" src="/static/core.js"></script>
 <script type="text/javascript" src="/static/calendar.js"></script>
-<script type="text/javascript" src="/static/admin/DateTimeShortcuts.js"></script>
-<script type="text/javascript" src="/static/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/DateTimeShortcuts.js"></script>
+<script type="text/javascript" src="/static/RelatedObjectLookups.js"></script>
+<script src="{% static '/img/calendar-icons.svg' %}"></script>
+<stript src="{% static '/img/icon-calendar.svg' %}"></script>
+<script src="{% static '/fonts/Roboto-Bold-webfont.woff' %}"></script>
+
+
 </head>
 <h1>Create your meal plan here!
 </h1>
 <form action="" method="post">
     {% csrf_token %}
-    {{ dateform.as_p }}
+    {{ dateform }}
     {% for key, val in checkform.items %}
         <p>
             {{ key }}

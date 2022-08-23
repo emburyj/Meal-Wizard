@@ -5,7 +5,9 @@ from cookbook.models import Ingredient, Recipe, Cookbook, RecipeCollection, Meal
 from cookbook.forms import *
 from django.utils.dateparse import parse_date
 
-# Create your views here.
+# --------------------------------------------------------------------------------------#
+# Views
+# --------------------------------------------------------------------------------------#
 def home_view(request):
     rec_coll_query = RecipeCollection.objects.all().order_by('-created_date')
     mealplan_recipes = {}
@@ -58,7 +60,37 @@ def grocery_list_view(request, rcid):
     context = {'groceries': get_shopping_list(rc), 'rcid': rcid}
     return render(request, 'grocery_shopping.html', context)
 
+def create_recipe_view(response):
+    if response.method == "POST":
+        form = new_recipe_form(response.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            rec_type = form.cleaned_data["rec_type"]
+            source = form.cleaned_data["source"]
+            #form = ...
+            return HttpResponseRedirect("/")
+    else:
+        recipe_form = new_recipe_form()
+        ing_form = {}
+        qty_form = {}
+        for i in range(0, 10):
+            ingredients_form = new_recipe_ingredients_form()
+            ingredients_form.fields[f"ingred{i}"] = ingredients_form.fields["ingred"]
+            ingredients_form.fields[f"qty{i}"] = ingredients_form.fields["qty"]
+            del(ingredients_form.fields["ingred"])
+            del(ingredients_form.fields["qty"])
+            ing_form.setdefault(i, ingredients_form)
+        context = {'recipe_form': recipe_form, 'ingredients_form': ing_form}
+        return render(response, 'create_recipe.html', context)
+
+# --------------------------------------------------------------------------------------#
+# Helper Functions
+# --------------------------------------------------------------------------------------#
 def get_shopping_list(rc):
+    '''
+    Desc: This function takes a RecipeCollection object and returns a dict of
+    {Ingredients_obj: qty} for a cumulative grocery shopping list for the collection.
+    '''
     mp_query = MealPlan.objects.filter(rec_col__exact=rc)
     ing_dict = {}
     for item in mp_query:
