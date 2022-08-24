@@ -6,30 +6,30 @@
 
 </head>
 <body>
-    <form method="post">
-    {% csrf_token %}
+    <form action="" method="post">
+        {% csrf_token %}
 
-    {{ recipe_form.as_p }}
-    Web Source? <input type="checkbox" id="Web_source_toggle" onclick="toggle_form()">
+        {{ recipe_form.as_p }}
+        Web Source? <input type="checkbox" id="Web_source_toggle" onclick="toggle_form()">
 
-    <p id="id_recipe_source_link" style="display:none">
-        Copy/Paste link to recipe:
-        <input type="text" name="recipe_source_link" maxlength="512" id="id_recipe_source_link">
-    </p>
-    <p>
-        <h3>Enter Ingredients:</h3>
-    </p>
-    <p>
-        <h3>Ingredient &emsp; &emsp; Qty</h3>
-    </p>
-    <p>
-        {% for key, val in ingredients_form.items %}
-            <p>{{ val }}</p>
-        {% endfor %}
-    </p>
-        <div class="submit">
-            <button type="submit" class="btn btn-primary btn-lg">Submit</button>
-        </div>
+        <p id="id_recipe_source_link" style="display:none">
+            Copy/Paste link to recipe:
+            <input type="text" name="recipe_source_link" maxlength="512" id="id_recipe_source_link">
+        </p>
+        <p>
+            <h3>Enter Ingredients:</h3>
+        </p>
+        <p>
+            <h3>Ingredient &emsp; &emsp; Qty &emsp; Type</h3>
+        </p>
+        <p>
+            {% for key, val in ingredients_form.items %}
+                <p>{{ val }}</p>
+            {% endfor %}
+        </p>
+            <div class="submit">
+                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            </div>
     </form>
 </body>
 {% endblock %}

@@ -4,6 +4,9 @@ from django.template import RequestContext, loader
 from cookbook.models import Ingredient, Recipe, Cookbook, RecipeCollection, MealPlan, User
 from cookbook.forms import *
 from django.utils.dateparse import parse_date
+from collections import OrderedDict
+from cookbook.forms import rec_type_choices
+from cookbook.forms import ing_type_choices
 
 # --------------------------------------------------------------------------------------#
 # Views
@@ -61,24 +64,62 @@ def grocery_list_view(request, rcid):
     return render(request, 'grocery_shopping.html', context)
 
 def create_recipe_view(response):
+    me = User.objects.get(username='josh')
     if response.method == "POST":
-        form = new_recipe_form(response.POST)
-        if form.is_valid():
-            name = form.cleaned_data["name"]
-            rec_type = form.cleaned_data["rec_type"]
-            source = form.cleaned_data["source"]
-            #form = ...
-            return HttpResponseRedirect("/")
+        # print(response.POST.dict)
+        rec_form = new_recipe_form(response.POST)
+        ing_form = new_recipe_ingredients_form(response.POST)
+        ing_form.fields[f"ingred0"] = ing_form.fields["ingred"]
+        ing_form.fields[f"qty0"] = ing_form.fields["qty"]
+        ing_form.fields[f"ing_type0"] = ing_form.fields["ing_type"]
+        del(ing_form.fields["ingred"])
+        del(ing_form.fields["qty"])
+        del(ing_form.fields["ing_type"])
+        for i in range(1, 10):
+            ing_form.fields[f"ingred{i}"] = ing_form.fields["ingred0"]
+            ing_form.fields[f"qty{i}"] = ing_form.fields["qty0"]
+            ing_form.fields[f"ing_type{i}"] = ing_form.fields["ing_type0"]
+
+
+        if rec_form.is_valid() and ing_form.is_valid():
+            name = rec_form.cleaned_data["name"]
+            rec_type_num = int(rec_form.cleaned_data["rec_type"]) - 1 # tuple for choices starts at 1
+            rec_type = list(list(rec_type_choices)[rec_type_num])[1]
+            if response.POST["recipe_source_link"]:
+                source = response.POST["recipe_source_link"]
+            else:
+                source = ""
+            new_recipe = Recipe(name=name, rec_type=rec_type, source=source, author=me)
+            new_recipe.save()
+
+            all_ingredients_query = Ingredient.objects.all()
+            all_ingredients = [x.name for x in all_ingredients_query]
+
+            for i in range(0, 10):
+                if ing_form.cleaned_data[f"ingred{i}"]:
+                    if ing_form.cleaned_data[f"ingred{i}"] in all_ingredients:
+                        current_ingredient = Ingredient.objects.get(name=ing_form.cleaned_data[f"ingred{i}"])
+
+                    else:
+                        current_ing_type_num = int(ing_form.cleaned_data[f"ing_type{i}"])
+                        current_ing_type = list(list(ing_type_choices)[current_ing_type_num])[1]
+                        current_ingredient = Ingredient(name=ing_form.cleaned_data[f"ingred{i}"], ing_type=current_ing_type)
+                        current_ingredient.save()
+                    new_cookbook = Cookbook(rec=new_recipe, ing=current_ingredient, qty=ing_form.cleaned_data[f"qty{i}"])
+                    new_cookbook.save()
+
+            return HttpResponseRedirect("/Create-New-Recipe/")
     else:
         recipe_form = new_recipe_form()
         ing_form = {}
-        qty_form = {}
         for i in range(0, 10):
             ingredients_form = new_recipe_ingredients_form()
             ingredients_form.fields[f"ingred{i}"] = ingredients_form.fields["ingred"]
             ingredients_form.fields[f"qty{i}"] = ingredients_form.fields["qty"]
+            ingredients_form.fields[f"ing_type{i}"] = ingredients_form.fields["ing_type"]
             del(ingredients_form.fields["ingred"])
             del(ingredients_form.fields["qty"])
+            del(ingredients_form.fields["ing_type"])
             ing_form.setdefault(i, ingredients_form)
         context = {'recipe_form': recipe_form, 'ingredients_form': ing_form}
         return render(response, 'create_recipe.html', context)
@@ -100,6 +141,7 @@ def get_shopping_list(rc):
                 ing_dict[foo.ing] = ing_dict[foo.ing] + foo.qty
             else:
                 ing_dict.setdefault(foo.ing, foo.qty)
+    ing_dict = OrderedDict(sorted(ing_dict.items(), key=lambda x: (x[0].ing_type, x[1]), reverse=True))
     return ing_dict
 
 def get_recs_ings(lst_of_recipes):
