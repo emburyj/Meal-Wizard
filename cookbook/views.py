@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import RequestContext, loader
+from django.contrib.auth.decorators import login_required
 from cookbook.models import Ingredient, Recipe, Cookbook, RecipeCollection, MealPlan, User
 from cookbook.forms import *
 from django.utils.dateparse import parse_date
@@ -11,8 +12,12 @@ from cookbook.forms import ing_type_choices
 # --------------------------------------------------------------------------------------#
 # Views
 # --------------------------------------------------------------------------------------#
+@login_required
 def home_view(request):
-    rec_coll_query = RecipeCollection.objects.all().order_by('-created_date')
+    # all_users_q = User.objects.all()
+    # all_users = [x for x in all_users_q]
+    current_user = request.user
+    rec_coll_query = RecipeCollection.objects.filter(author__exact=current_user).order_by('-created_date')
     mealplan_recipes = {}
     for item in rec_coll_query:
         rec_query = MealPlan.objects.filter(rec_col__exact=item)
@@ -21,15 +26,16 @@ def home_view(request):
     context = {'MP_Recs': mealplan_recipes} # {RecipeCollection_object: [Recipe_object,]}
     return render(request, 'home.html', context)
 
+@login_required
 def create_meal_plan_view(response):
-    recs_all_q = Recipe.objects.all() # query of all recipe objects
+    current_user = response.user
+    recs_all_q = Recipe.objects.filter(author__exact=current_user) # query of all recipe objects
     recs_all = [x for x in recs_all_q]
     recs_ings = get_recs_ings(recs_all)
-    me = User.objects.get(username='josh')
     prefix = '/cookbook/static/'
     if response.method == "POST":
         start_date = parse_date(response.POST['date'])
-        new_rc_obj = RecipeCollection(author=me, created_date=start_date)
+        new_rc_obj = RecipeCollection(author=current_user, created_date=start_date)
         new_rc_obj.save()
         for i in range(0, len(recs_all)):
             if recs_all[i].name in response.POST:
@@ -50,6 +56,7 @@ def create_meal_plan_view(response):
        'checkform': recs_ings_checkform,
        'admin_media_prefix': prefix})
 
+@login_required
 def meal_plan_detail_view(request, rcid):
     rc = RecipeCollection.objects.get(pk=rcid) # this gives you the RC object
     meal_plan_q = MealPlan.objects.filter(rec_col__exact=rc) # this gives a query obj
@@ -58,13 +65,16 @@ def meal_plan_detail_view(request, rcid):
     context = {'recipes_ingredients': recs_ings, 'rcid': rcid}
     return render(request, 'mp_detail.html', context)
 
+@login_required
 def grocery_list_view(request, rcid):
     rc = RecipeCollection.objects.get(pk=rcid) # this gives you the RC object
     context = {'groceries': get_shopping_list(rc), 'rcid': rcid}
     return render(request, 'grocery_shopping.html', context)
 
+@login_required
 def create_recipe_view(response):
-    me = User.objects.get(username='josh')
+    current_user = response.user
+
     if response.method == "POST":
         # print(response.POST.dict)
         rec_form = new_recipe_form(response.POST)
@@ -89,7 +99,7 @@ def create_recipe_view(response):
                 source = response.POST["recipe_source_link"]
             else:
                 source = ""
-            new_recipe = Recipe(name=name, rec_type=rec_type, source=source, author=me)
+            new_recipe = Recipe(name=name, rec_type=rec_type, source=source, author=current_user)
             new_recipe.save()
 
             all_ingredients_query = Ingredient.objects.all()
@@ -123,6 +133,7 @@ def create_recipe_view(response):
             ing_form.setdefault(i, ingredients_form)
         context = {'recipe_form': recipe_form, 'ingredients_form': ing_form}
         return render(response, 'create_recipe.html', context)
+
 
 # --------------------------------------------------------------------------------------#
 # Helper Functions
