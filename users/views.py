@@ -1,6 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from .forms import UserRegisterForm
+from django.contrib.auth.decorators import login_required
+from datetime import datetime as dt
+from cookbook.models import *
+from cookbook.forms import new_recipe_ingredients_form, ing_type_choices, rec_type_choices
 
 def register(request):
     if request.method == "POST":
@@ -17,5 +22,68 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'users/register.html', {'form': form})
 
-def profile(request):
-    return render(request, 'users/profile.html')
+@login_required
+def profile_view(request, username):
+    displayed_user = User.objects.get(username=username)
+    if request.method == "POST":
+        # -------------------------------------------------- #  Staple ingredient form stuff
+        ing_form = new_recipe_ingredients_form(request.POST)
+        ing_form.fields[f"ingred0"] = ing_form.fields["ingred"]
+        ing_form.fields[f"qty0"] = ing_form.fields["qty"]
+        ing_form.fields[f"ing_type0"] = ing_form.fields["ing_type"]
+        del(ing_form.fields["ingred"])
+        del(ing_form.fields["qty"])
+        del(ing_form.fields["ing_type"])
+        for i in range(1, 10):
+            ing_form.fields[f"ingred{i}"] = ing_form.fields["ingred0"]
+            ing_form.fields[f"qty{i}"] = ing_form.fields["qty0"]
+            ing_form.fields[f"ing_type{i}"] = ing_form.fields["ing_type0"]
+
+        staple_recipe_name = f"{username}_staple_recipe"
+
+        # check if staple recipe for this user exists. if so, delete it.
+        try:
+            staple_check = Recipe.objects.get(name=staple_recipe_name).delete()
+        except:
+            pass
+        staple_recipe = Recipe(name=staple_recipe_name, rec_type='Other', source="#", author=displayed_user)
+        staple_recipe.save()
+
+        # query for all ingredients
+        all_ingredients_query = Ingredient.objects.all()
+        all_ingredients = [x.name for x in all_ingredients_query]
+
+        if ing_form.is_valid():
+        # check if ingredient entered already exists. If so, use it. If not, create it. Create cookbook object.
+            for i in range(0, 10):
+                if ing_form.cleaned_data[f"ingred{i}"]:
+                    if ing_form.cleaned_data[f"ingred{i}"] in all_ingredients:
+                        current_ingredient = Ingredient.objects.get(name=ing_form.cleaned_data[f"ingred{i}"])
+
+                    else:
+                        current_ing_type_num = int(ing_form.cleaned_data[f"ing_type{i}"])
+                        current_ing_type = list(list(ing_type_choices)[current_ing_type_num])[1]
+                        current_ingredient = Ingredient(name=ing_form.cleaned_data[f"ingred{i}"], ing_type=current_ing_type)
+                        current_ingredient.save()
+                    new_cookbook = Cookbook(rec=staple_recipe, ing=current_ingredient, qty=ing_form.cleaned_data[f"qty{i}"])
+                    new_cookbook.save()
+            return HttpResponseRedirect(f"/Profile/{request.user.username}")
+        # -------------------------------------------------- #
+
+    else:
+        date_joined = dt.date(displayed_user.date_joined)
+        user_recipes = Recipe.objects.filter(author=displayed_user) # will need to filter with an exclude for staples..
+        ing_form = {}
+        for i in range(0, 10):
+            ingredients_form = new_recipe_ingredients_form()
+            ingredients_form.fields[f"ingred{i}"] = ingredients_form.fields["ingred"]
+            ingredients_form.fields[f"qty{i}"] = ingredients_form.fields["qty"]
+            ingredients_form.fields[f"ing_type{i}"] = ingredients_form.fields["ing_type"]
+            del(ingredients_form.fields["ingred"])
+            del(ingredients_form.fields["qty"])
+            del(ingredients_form.fields["ing_type"])
+            ing_form.setdefault(i, ingredients_form)
+
+        context = {'displayed_user': displayed_user, 'date_joined': date_joined,
+         'user_recipes': user_recipes, 'ingredients_form': ing_form}
+    return render(request, 'users/profile.html', context)

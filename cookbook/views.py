@@ -29,7 +29,7 @@ def home_view(request):
 @login_required
 def create_meal_plan_view(response):
     current_user = response.user
-    recs_all_q = Recipe.objects.filter(author__exact=current_user) # query of all recipe objects
+    recs_all_q = Recipe.objects.filter(author__exact=current_user).exclude(name__exact=f"{current_user.username}_staple_recipe") # query of all recipe objects; exclude staple rec
     recs_all = [x for x in recs_all_q]
     recs_ings = get_recs_ings(recs_all)
     prefix = '/cookbook/static/'
@@ -68,7 +68,7 @@ def meal_plan_detail_view(request, rcid):
 @login_required
 def grocery_list_view(request, rcid):
     rc = RecipeCollection.objects.get(pk=rcid) # this gives you the RC object
-    context = {'groceries': get_shopping_list(rc), 'rcid': rcid}
+    context = {'groceries': get_shopping_list(rc, request.user.username), 'rcid': rcid}
     return render(request, 'grocery_shopping.html', context)
 
 @login_required
@@ -138,7 +138,7 @@ def create_recipe_view(response):
 # --------------------------------------------------------------------------------------#
 # Helper Functions
 # --------------------------------------------------------------------------------------#
-def get_shopping_list(rc):
+def shopping_items(rc):
     '''
     Desc: This function takes a RecipeCollection object and returns a dict of
     {Ingredients_obj: qty} for a cumulative grocery shopping list for the collection.
@@ -167,3 +167,20 @@ def get_recs_ings(lst_of_recipes):
             current_ing_dict.setdefault(i.ing, i.qty)
         recs_ings.setdefault(item, current_ing_dict) # {recipe_object: {ing_object: qty}}
     return recs_ings
+
+def get_shopping_list(rc, username):
+    staple_recipe_name = f"{username}_staple_recipe"
+    try:
+        staple_recipe = [Recipe.objects.get(name=staple_recipe_name)]
+    except:
+        staple_recipe = []
+
+    staple_ings = get_recs_ings(staple_recipe)
+    shopping = shopping_items(rc)
+    if staple_recipe:
+        for ing, qty in staple_ings[staple_recipe[0]].items():
+            if ing in shopping:
+                shopping[ing] = shopping[ing] + qty
+            else:
+                shopping[ing] = qty
+    return shopping

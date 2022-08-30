@@ -1,4 +1,48 @@
 {% extends "base.html" %}{% block content %}
-{{ user.username }}
+    <h2>
+        {{ displayed_user.username }}<small> Member since {{date_joined}}</small>
+    </h2>
+    {% if displayed_user == user %}
+        {% comment %}Button to follow user -- need logic if alrady following (unfollow) {% endcomment %}
+    {% endif %}
+
+    <div>    {% comment %}Div for recipes added by user{% endcomment %}
+        <h2>
+            Recipes added by {{ displayed_user.username }}:
+        </h2>
+        {% for recipe in user_recipes %}
+            <li>
+                <a href="{{ recipe.source }}">{{ recipe.name }}</a>, added on {{ recipe.created_date }}
+            </li>
+        {% endfor %}
+    </div>
+
+    {% if displayed_user == user %}
+    <div>     {% comment %}Div for adding staple items{% endcomment %}
+        <p></p>
+        <p><h2>Add staple ingredients here</h2>
+            Enter items below and they will show up when you create a grocery list from a meal plan!
+        </p>
+            <form action="" method="post">
+                {% csrf_token %}
+                <div>
+                    <p>
+                        <h3>Enter Ingredients:</h3>
+                    </p>
+                    <p>
+                        <h3>Ingredient &emsp; &emsp; Qty &emsp; Type</h3>
+                    </p>
+                    <p>
+                        {% for key, val in ingredients_form.items %}
+                            <p>{{ val }}</p>
+                        {% endfor %}
+                    </p>
+                </div>
+                <div class="submit">
+                    <button type="submit" class="btn btn-primary btn-lg">Save Items</button>
+                </div>
+            </form>
+    </div>
+    {% endif %}
 
 {% endblock content %}
