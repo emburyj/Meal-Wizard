@@ -1,10 +1,72 @@
 {% extends "base.html" %}{% block content %}
+
     <h2>
         {{ displayed_user.username }}<small> Member since {{date_joined}}</small>
     </h2>
-    {% if displayed_user == user %}
-        {% comment %}Button to follow user -- need logic if alrady following (unfollow) {% endcomment %}
+    {% comment %}------------------------------------------------------------------------
+    Getting followers and followings
+    {% endcomment %}
+    <h2>
+        Followers:
+    </h2>
+    {% if followers %}
+        {% for f in followers %}
+            <li>
+                {{ f.username }}
+            </li>
+        {% endfor %}
+    {% else %}
+        <li>No followers yet
+        </li>
     {% endif %}
+    <h2>
+        Following:
+    </h2>
+    {% if following %}
+        {% for f in following %}
+            <li>
+                {{ f.username }}
+            </li>
+        {% endfor %}
+    {% else %}
+        <li>Not following anyone yet
+        </li>
+    {% endif %}
+
+    {% comment %}------------------------------------------------------------------------
+    {% endcomment %}
+    {% if displayed_user != user %}
+            {% if follow %}
+                <div>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {{ follow_form }}
+                        <div class="submit">
+                            <button type="submit" class="btn btn-primary btn-lg">Unfollow</button>
+                        </div>
+                    </form>
+                </div>
+
+            {% else %}
+                <div>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        {{ follow_form }}
+                        <div class="submit">
+                            <button type="submit" class="btn btn-primary btn-lg">Follow</button>
+                        </div>
+                    </form>
+                </div>
+
+            {% endif %}
+
+
+
+
+    {% endif %}
+    {% comment %}
+    ---------------------------------------------------------------------------------------
+    {% endcomment %}
 
     <div>    {% comment %}Div for recipes added by user{% endcomment %}
         <h2>

@@ -8,6 +8,7 @@ from django.utils.dateparse import parse_date
 from collections import OrderedDict
 from cookbook.forms import rec_type_choices
 from cookbook.forms import ing_type_choices
+from users.models import *
 
 # --------------------------------------------------------------------------------------#
 # Views
@@ -17,19 +18,21 @@ def home_view(request):
     # all_users_q = User.objects.all()
     # all_users = [x for x in all_users_q]
     current_user = request.user
+    recs_all_q = get_recipes_following(current_user).order_by('-created_date')# query of all recipe objects of current user and everyone they're following
+    recs_all_list = [x for x in recs_all_q]
     rec_coll_query = RecipeCollection.objects.filter(author__exact=current_user).order_by('-created_date')
     mealplan_recipes = {}
     for item in rec_coll_query:
         rec_query = MealPlan.objects.filter(rec_col__exact=item)
         recs = [mp.rid for mp in rec_query]
-        mealplan_recipes.setdefault(item, recs)
-    context = {'MP_Recs': mealplan_recipes} # {RecipeCollection_object: [Recipe_object,]}
+        mealplan_recipes.setdefault(item, recs) # mealplan recipes is {RecipeCollection_object: [Recipe_object,]}
+    context = {'MP_Recs': mealplan_recipes, 'recent_recipes':recs_all_list}
     return render(request, 'home.html', context)
 
 @login_required
 def create_meal_plan_view(response):
     current_user = response.user
-    recs_all_q = Recipe.objects.filter(author__exact=current_user).exclude(name__exact=f"{current_user.username}_staple_recipe") # query of all recipe objects; exclude staple rec
+    recs_all_q = get_recipes_following(current_user) # query of all recipe objects of current user and everyone they're following
     recs_all = [x for x in recs_all_q]
     recs_ings = get_recs_ings(recs_all)
     prefix = '/cookbook/static/'
@@ -184,3 +187,14 @@ def get_shopping_list(rc, username):
             else:
                 shopping[ing] = qty
     return shopping
+
+def get_recipes_following(user):
+
+    # get users that user is following
+    following_query = Follow.objects.filter(follower=user)
+    following_list = [x.followed for x in following_query]
+    following_list.append(user) # add user to get their recipes too
+    # get recipes authored by these users
+    staple_strings = [f"{x.username}_staple_recipe" for x in following_list]
+    recipes_following_query = Recipe.objects.filter(author__in=following_list).exclude(name__in=staple_strings)
+    return recipes_following_query

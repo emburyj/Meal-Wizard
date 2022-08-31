@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, UserFollowForm
 from django.contrib.auth.decorators import login_required
 from datetime import datetime as dt
 from cookbook.models import *
+from users.models import *
 from cookbook.forms import new_recipe_ingredients_form, ing_type_choices, rec_type_choices
 
 def register(request):
@@ -25,7 +26,19 @@ def register(request):
 @login_required
 def profile_view(request, username):
     displayed_user = User.objects.get(username=username)
+    current_user = request.user
     if request.method == "POST":
+        # -------------------------------------------------- # # follow form stuff
+        if current_user != displayed_user:
+            follow_form = UserFollowForm(request.POST)
+            if follow_form.is_valid():
+                if follow_form.cleaned_data['box']:
+                    Follow.objects.get(followed=displayed_user, follower=current_user).delete()
+                else:
+                    new_follow = Follow(followed=displayed_user, follower=current_user)
+                    new_follow.save()
+                return HttpResponseRedirect(f"/Profile/{displayed_user.username}")
+
         # -------------------------------------------------- #  Staple ingredient form stuff
         ing_form = new_recipe_ingredients_form(request.POST)
         ing_form.fields[f"ingred0"] = ing_form.fields["ingred"]
@@ -71,8 +84,23 @@ def profile_view(request, username):
         # -------------------------------------------------- #
 
     else:
+        # follow form stuff
+        followers_query = Follow.objects.filter(followed=displayed_user)
+        followers_list = [x.follower for x in followers_query]
+        following_query = Follow.objects.filter(follower=displayed_user)
+        following_list = [x.followed for x in following_query]
+        if current_user in followers_list:
+            following = True
+        else:
+            following = False
+        follow_form = UserFollowForm()
+        follow_form.fields['box'].initial = following
+
+        # date displayed user joined
         date_joined = dt.date(displayed_user.date_joined)
-        user_recipes = Recipe.objects.filter(author=displayed_user) # will need to filter with an exclude for staples..
+        # all recipes created by displayed user:
+        user_recipes = Recipe.objects.filter(author=displayed_user).exclude(name__exact=f"{displayed_user.username}_staple_recipe") # will need to filter with an exclude for staples..
+        # staple ingredient sutff:
         ing_form = {}
         for i in range(0, 10):
             ingredients_form = new_recipe_ingredients_form()
@@ -85,5 +113,7 @@ def profile_view(request, username):
             ing_form.setdefault(i, ingredients_form)
 
         context = {'displayed_user': displayed_user, 'date_joined': date_joined,
-         'user_recipes': user_recipes, 'ingredients_form': ing_form}
+         'user_recipes': user_recipes, 'ingredients_form': ing_form,
+         'follow': following, 'follow_form': follow_form,
+         'followers': followers_list, 'following': following_list}
     return render(request, 'users/profile.html', context)
