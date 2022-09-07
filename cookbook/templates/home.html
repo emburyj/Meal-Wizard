@@ -1,14 +1,14 @@
-{% extends "base.html" %}{% block content %}
+{% extends "base.html" %}
+{% load static %}
 
-<div class="container">
-    <div class="row g-4">
         <!-- Left side nav start -->
-        <div class="col-lg-3">
-            <div class="row g-4">
+
+            {% block leftnav %}
+            <div class="row g-4 pt-2">
                 <!-- Card Recent Recipes Start -->
                 <div class="card">
                     <!-- Card header start -->
-                    <div class="card-header pb-0 border-0">
+                    <div class="card-header pb-0 border-0" style="background-color:white;">
                         <h5 class="card-title mb-0">
                             Recently Added Recipes
                         </h5>
@@ -18,7 +18,7 @@
                         {% for recipe in recent_recipes %}
                             <div class="hstack gap-2 mb-3">
                                 <div class="overflow-hidden">
-                                    <a class="h6 mb-0" href="{{ recipe.source }}">{{ recipe.name }}</a>
+                                    <a class="h6 mb-0 recipeLink" href="{{ recipe.source }}">{{ recipe.name }}</a>
                                     <p class="mb-0 small text truncate">
                                         Added by
                                         <a class="userLink" href="{% url 'profile' recipe.author %}">{{ recipe.author }}</a>
@@ -30,44 +30,33 @@
                     </div>
                 </div>
             </div>
-        </div>
+            {% endblock %}
+            <!-- Left nav end -->
         <!-- Center nav start -->
+            {% block centernav %}
         <!-- Button to create new MP -->
-        <div class="col-md-8 col-lg-6 vstack gap-4">
-            <div class="m-3">
-                <a href="{% url 'create_mp' %}" role="button" class="btn btn-primary-bg">
-                    Create new meal plan!
-                </a>
+            <div class="col-lg align-self-center pt-2 container-lg">
+                    <a href="{% url 'create_mp' %}" role="button" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid px-5">
+                        <h1>Create new meal plan</h1>
+                        <h1 style="font-size:6vw">+</h1>
+                        <svg width="1em" height="1em" class="md-3">
+                    </a>
             </div>
-            <div class="card themeColor">
-                <div class="card-body m-5 themeColor">
-                    <h2>
-                    </h2>
-                </div>
-            </div>
-            {% for key, val in MP_Recs.items %}
 
-            <div class="card m-5">
-                <div class="card-header">
-                </div>
-                <h2>
-                    <a class="mealplanLink" href="{% url 'mp_detail' key.rcid %}">Meal Plan for week of {{ key.created_date }}</a>
-                </h2>
-                <div class="card-body themeColor">
-                    <h3>
-                        Meals for the week:
+            <!-- Button for each existing meal plan -->
+            {% for key, val in MP_Recs.items %}
+            <div class="col align-self-center container-lg">
+                <a href="{% url 'mp_detail' key.rcid %}" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5">
+                    <h2>Meal Plan for week of {{ key.created_date }} - {{ key.author }}</h2>
                         {% for item in val %}
                             <li>
                                 {{ item.name }}
                             </li>
                         {% endfor %}
-                    </h3>
-
-                </div>
+                </a>
             </div>
             {% endfor %}
-        </div>
+        {% endblock %}
+        <!-- Center nav end -->
     </div>
 </div>
-
-{% endblock %}

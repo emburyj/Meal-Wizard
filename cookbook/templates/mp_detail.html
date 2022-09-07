@@ -1,23 +1,37 @@
-{% extends "base.html" %}{% block content %}
+{% extends "base.html" %}
 
-<h1>
-    This is the Meal Plan Detail View!
-</h1>
-<h1>
-    <a href="{% url 'grocery_shopping' rcid %}">Switch to Shopping List View!</a>
-</h1>
+
+
+{% block leftnav %}
+<div class="row g-4 pt-2" style="background-color:white;">
+    <!-- Card Recent Recipes Start -->
+    <div class="card border-0">
+        <!-- Card header start -->
+        <div class="card-header pb-0 border-0" style="background-color:white;">
+
+            <a href="{% url 'grocery_shopping' rcid %}" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5">
+                Switch to Shopping List View!
+            </a>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block centernav %}
 
 {% for key, val in recipes_ingredients.items %}
-    <h2>
-        <a href="{{key.source}}">{{ key }}</a>
-    </h2>
-    {% for ing, qty in val.items %}
-
-        <li>
-            {{ qty }} {{ ing }}
-        </li>
-
-    {% endfor %}
+<div class="col align-self-center container-lg pt-2">
+    <a href="{{ key.source }}" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5">
+        <h2>{{ key }}</h2>
+            {% for ing, qty in val.items %}
+                <li>
+                    {{ qty }} {{ ing }}
+                </li>
+            {% endfor %}
+    </a>
+</div>
 {% endfor %}
+
 
 {% endblock %}
