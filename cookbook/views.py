@@ -108,7 +108,7 @@ def create_recipe_view(response):
             all_ingredients_query = Ingredient.objects.all()
             all_ingredients = [x.name for x in all_ingredients_query]
 
-            for i in range(0, 10):
+            for i in range(0, 15):
                 if ing_form.cleaned_data[f"ingred{i}"]:
                     if ing_form.cleaned_data[f"ingred{i}"] in all_ingredients:
                         current_ingredient = Ingredient.objects.get(name=ing_form.cleaned_data[f"ingred{i}"])
@@ -125,7 +125,7 @@ def create_recipe_view(response):
     else:
         recipe_form = new_recipe_form()
         ing_form = {}
-        for i in range(0, 10):
+        for i in range(0, 15):
             ingredients_form = new_recipe_ingredients_form()
             ingredients_form.fields[f"ingred{i}"] = ingredients_form.fields["ingred"]
             ingredients_form.fields[f"qty{i}"] = ingredients_form.fields["qty"]

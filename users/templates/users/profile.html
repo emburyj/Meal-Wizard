@@ -1,40 +1,55 @@
-{% extends "base.html" %}{% block content %}
+{% extends "base.html" %}
 
-    <h2>
-        {{ displayed_user.username }}<small> Member since {{date_joined}}</small>
-    </h2>
-    {% comment %}------------------------------------------------------------------------
-    Getting followers and followings
-    {% endcomment %}
-    <h2>
-        Followers:
-    </h2>
-    {% if followers %}
-        {% for f in followers %}
-            <li>
-                {{ f.username }}
+{% block leftnav %}
+<div class="row g-4 pt-2">
+    <!-- Card Recent Recipes Start -->
+    <div class="card">
+        <!-- Card header start -->
+        <div class="card-header pb-0 border-0" style="background-color:white;">
+            <h2>
+                {{ displayed_user.username }}
+            </h2>
+            <h5> Member since {{date_joined}}</h5>
+        </div>
+    </div>
+{% comment %}
+------------------------------------------------------------------------
+                    Getting followers and followings
+{% endcomment %}
+    <div class="card">
+        <h5 class="card-title mb-0">
+            Followers:
+        </h5>
+            {% if followers %}
+                {% for f in followers %}
+                    <li>
+                        <a class="userLink" href="{% url 'profile' f.username %}">{{ f.username }}</a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>No followers yet
+                </li>
+            {% endif %}
+    </div>
+    <div class="card">
+        <h5 class="card-title mb-0">
+            Following:
+        </h5>
+        {% if following %}
+            {% for f in following %}
+                <li>
+                    <a class="userLink" href="{% url 'profile' f.username %}">{{ f.username }}</a>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>Not following anyone yet
             </li>
-        {% endfor %}
-    {% else %}
-        <li>No followers yet
-        </li>
-    {% endif %}
-    <h2>
-        Following:
-    </h2>
-    {% if following %}
-        {% for f in following %}
-            <li>
-                {{ f.username }}
-            </li>
-        {% endfor %}
-    {% else %}
-        <li>Not following anyone yet
-        </li>
-    {% endif %}
+        {% endif %}
+    </div>
+{% comment %}------------------------------------------------------------------------
+                                    Follow form
+{% endcomment %}
 
-    {% comment %}------------------------------------------------------------------------
-    {% endcomment %}
     {% if displayed_user != user %}
             {% if follow %}
                 <div>
@@ -42,7 +57,9 @@
                         {% csrf_token %}
                         {{ follow_form }}
                         <div class="submit">
-                            <button type="submit" class="btn btn-primary btn-lg">Unfollow</button>
+                            <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #20B2AA; font-family: Arial, Helvetica, sans-serif;">
+                                Unfollow
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -53,44 +70,61 @@
                         {% csrf_token %}
                         {{ follow_form }}
                         <div class="submit">
-                            <button type="submit" class="btn btn-primary btn-lg">Follow</button>
+                            <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #20B2AA; font-family: Arial, Helvetica, sans-serif;">
+                                Follow
+                            </button>
                         </div>
                     </form>
                 </div>
-
             {% endif %}
-
-
-
-
     {% endif %}
-    {% comment %}
-    ---------------------------------------------------------------------------------------
-    {% endcomment %}
+</div>
+{% endblock %}
 
-    <div>    {% comment %}Div for recipes added by user{% endcomment %}
-        <h2>
-            Recipes added by {{ displayed_user.username }}:
-        </h2>
-        {% for recipe in user_recipes %}
-            <li>
-                <a href="{{ recipe.source }}">{{ recipe.name }}</a>, added on {{ recipe.created_date }}
-            </li>
-        {% endfor %}
+
+{% block centernav %}
+<div class="col-lg align-self-center pt-2 container-lg gap-2">
+{% comment %}
+    ---------------------------------------------------------------------------------------
+                            Div for recipes added by user
+{% endcomment %}
+
+    <div class="card">
+        <div class="card-header pb-0 border-0" style="background-color:white;">
+            <h2>
+                Recipes added by {{ displayed_user.username }}:
+            </h2>
+        </div>
+        <div class="card-body">
+            {% for recipe in user_recipes %}
+                <li>
+                    <a class="recipeLink" href="{{ recipe.source }}">{{ recipe.name }}</a>, added on {{ recipe.created_date }}
+                </li>
+            {% endfor %}
+        </div>
     </div>
 
+{% comment %}
+    ---------------------------------------------------------------------------------------
+                             Div for adding staple items
+{% endcomment %}
     {% if displayed_user == user %}
-    <div>     {% comment %}Div for adding staple items{% endcomment %}
-        <p></p>
-        <p><h2>Add staple ingredients here</h2>
-            Enter items below and they will show up when you create a grocery list from a meal plan!
-        </p>
+    <div class="card">
+        <div class="card-header pb-0 border-0" style="background-color:white;">
+            <h2>
+                Add staple ingredients here
+            </h2>
+            <h5>
+                Enter items below and they will show up when you create a grocery list from a meal plan!
+            </h5>
+        </div>
+        <div class="card-body">
             <form action="" method="post">
                 {% csrf_token %}
-                <div>
-                    <p>
+                <div style="font-family: Arial, Helvetica, sans-serif;">
+
                         <h3>Enter Ingredients:</h3>
-                    </p>
+
                     <p>
                         <h3>Ingredient &emsp; &emsp; Qty &emsp; Type</h3>
                     </p>
@@ -104,7 +138,8 @@
                     <button type="submit" class="btn btn-primary btn-lg">Save Items</button>
                 </div>
             </form>
+        </div>
     </div>
     {% endif %}
-
-{% endblock content %}
+</div>
+{% endblock %}

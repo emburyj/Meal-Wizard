@@ -1,35 +1,57 @@
-{% extends "base.html" %}{% block content %}
+{% extends "base.html" %}
 {% load static %}
+
+{% block leftnav %}
 <head>
     <link rel="stylesheet" type="text/css" href="{% static 'toggle_style.css' %}">
     <script src="{% static 'toggle_script.js' %}"></script>
 
 </head>
-<body>
-    <form action="" method="post">
-        {% csrf_token %}
 
-        {{ recipe_form.as_p }}
-        Web Source? <input type="checkbox" id="Web_source_toggle" onclick="toggle_form()">
+<form action="" method="post">
+{% csrf_token %}
+    <div class="row g-4 pt-2 vstack gap-2" style="background-color:white;">
+        <!-- Card Recent Recipes Start -->
+        <div class="card">
+        <!-- Card header start -->
+            <div class="card-body align-self-center" style="background-color:white;">
+                {{ recipe_form.as_p }}
+                Web Source? <input type="checkbox" id="Web_source_toggle" onclick="toggle_form()">
 
-        <p id="id_recipe_source_link" style="display:none">
-            Copy/Paste link to recipe:
-            <input type="text" name="recipe_source_link" maxlength="512" id="id_recipe_source_link">
-        </p>
-        <p>
-            <h3>Enter Ingredients:</h3>
-        </p>
-        <p>
-            <h3>Ingredient &emsp; &emsp; Qty &emsp; Type</h3>
-        </p>
-        <p>
-            {% for key, val in ingredients_form.items %}
-                <p>{{ val }}</p>
-            {% endfor %}
-        </p>
-            <div class="submit">
-                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                <p id="id_recipe_source_link" style="display:none">
+                    Copy/Paste link to recipe:
+                    <input type="text" name="recipe_source_link" maxlength="512" id="id_recipe_source_link">
+                </p>
+
             </div>
-    </form>
-</body>
+        </div>
+        <div class="submit align-self-center">
+            <button class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #20B2AA; font-family: Arial, Helvetica, sans-serif;">
+                Create New Recipe
+            </button>
+        </div>
+    </div>
 {% endblock %}
+
+{% block centernav %}
+    <div class="row g-4 pt-2 vstack gap-2" style="background-color:white;">
+        <div class="card">
+            <div class="card-header">
+                <h3>Enter Ingredients:</h3>
+            </div>
+
+
+                <h3>Ingredient &emsp; &emsp; Qty &emsp; Type</h3>
+
+
+            <div class="card-body">
+                {% for key, val in ingredients_form.items %}
+                    <p>{{ val }}</p>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</form>
+{% endblock %}
+

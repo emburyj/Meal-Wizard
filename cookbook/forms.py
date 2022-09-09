@@ -23,7 +23,7 @@ rec_type_choices = ((1, 'Salad'), (2, 'Soup'), (3, 'Pasta'), (4, 'Curry'),
 
 class new_recipe_form(forms.Form):
     name = forms.CharField(label = "Recipe Name", max_length=128)
-    rec_type = forms.ChoiceField(choices=rec_type_choices)
+    rec_type = forms.ChoiceField(choices=rec_type_choices, label="Recipe Type")
 
 ing_type_choices = ((0, ""), (1, "Meat"), (2, "Produce"), (3,"Dairy"), (4, "Grain"),
  (5, "Pasta"), (6, "Canned"), (7, "Condiment"), (8, "Other"))
