@@ -1,36 +1,45 @@
-{% extends "base.html" %}{% block content %}
-<head>
-{% load i18n static%}
-<link rel="stylesheet" type="text/css" href="/static/base.css" />
-<link rel="stylesheet" type="text/css" href="/static/widgets.css" />
-<script type="text/javascript" src="/jsi18n/"></script>
-<script type="text/javascript" src="/static/core.js"></script>
-<script type="text/javascript" src="/static/calendar.js"></script>
-<script type="text/javascript" src="/static/DateTimeShortcuts.js"></script>
-<script type="text/javascript" src="/static/RelatedObjectLookups.js"></script>
-<script src="{% static '/img/calendar-icons.svg' %}"></script>
-<stript src="{% static '/img/icon-calendar.svg' %}"></script>
-<script src="{% static '/fonts/Roboto-Bold-webfont.woff' %}"></script>
-
-
-</head>
-<h1>Create your meal plan here!
-</h1>
+{% extends "base.html" %}
 <form action="" method="post">
     {% csrf_token %}
-    {{ dateform }}
+
+{% block leftnav %}
+<div class="row g-4 pt-2" style="background-color:white;">
+    <!-- Card Recent Recipes Start -->
+    <div class="card border-0">
+        <!-- Card header start -->
+        <div class="card-header pb-0 border-0" style="background-color:white;">
+            {{ dateform }}
+        </div>
+        <div class="card-body align-self-center">
+            <div class="submit">
+                <button type="submit" class="btn btn-lg btn-outline-dark mx-auto" style="--bs-btn-bg: #20B2AA; font-family: Arial, Helvetica, sans-serif;">
+                    Create Meal Plan!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block centernav %}
+<div class="container-lg align-self-center vstack gap-4">
+    <h1>Select your meals for the week:
+    </h1>
     {% for key, val in checkform.items %}
-        <p>
-            {{ key }}
-            {% for ing, qty in val.items %}
+    <div class="card">
+        <div class="card-header border-0 pb-0 card-header-font" style="font-family: Arial, Helvetica, sans-serif; font-weight:bold;">
+                {{ key }}
+        </div>
+        <div class="card-body" style="font-family: Arial, Helvetica, sans-serif;">
+                {% for ing, qty in val.items %}
                 <li>
                     {{ qty }} {{ ing }}
                 </li>
         {% endfor %}
-        </p>
-    {% endfor %}
-    <div class="submit">
-        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+        </div>
     </div>
+    {% endfor %}
+</div>
 </form>
 {% endblock %}

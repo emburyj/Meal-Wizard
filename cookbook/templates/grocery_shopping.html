@@ -1,15 +1,38 @@
-{% extends "base.html" %}{% block content %}
-<h1>
-    This is the grocery shopping list view!
-</h1>
-<h1>
-    <a href="{% url 'mp_detail' rcid %}">Switch to Meal Plan Detail View!</a>
-</h1>
+{% extends "base.html" %}
+
+{% block leftnav %}
+<div class="row g-4 pt-2" style="background-color:white;">
+    <!-- Card Recent Recipes Start -->
+    <div class="card border-0">
+        <!-- Card header start -->
+        <div class="card-header pb-0 border-0" style="background-color:white;">
+
+            <a href="{% url 'mp_detail' rcid %}" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5">
+                Switch to Meal Plan Detail View!
+            </a>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block centernav %}
 
 <h2>
     This is what to buy at the grocery store:
 </h2>
+
 {% for key, val in groceries.items %}
-    <li>{{ val }} {{ key }}</li>
+
+        <button type="button" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5 " data-bs-toggle="button">
+            {{ val }} {{ key }}
+        </button>
+
+<!--     <h2 class="large-list">
+        <li>{{ val }} {{ key }}</li>
+    </h2> -->
+
 {% endfor %}
+
 {% endblock %}

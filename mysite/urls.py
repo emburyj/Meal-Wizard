@@ -18,7 +18,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, re_path
 from cookbook.views import meal_plan_detail_view, home_view, grocery_list_view, create_meal_plan_view, create_recipe_view
 from users import views as user_views
-from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -44,7 +43,6 @@ urlpatterns = [
     re_path(r'Create-New-Recipe/',
             create_recipe_view,
             name="create_recipe"),
-    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     # re_path(r'^category/(?P<category_id>\d+)/$',
     #         cat_view,
     #         name="blog_cat")

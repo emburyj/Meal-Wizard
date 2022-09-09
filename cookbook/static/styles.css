@@ -27,6 +27,25 @@ a.btn-primary-bg {
     --bs-btn-hover-bg: #20B2AA;
 }
 
+button.btn-primary-bg {
+    --bs-btn-bg: white;
+    border-radius: 50px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    --bs-btn-hover-bg: #20B2AA;
+}
+
 h1.font-extra-large {
     font-size: 100%;
+}
+
+h2.large-list {
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div.card-header{
+    font-weight: bold;
+    font-size: 40px;
+    font-family: Arial, Helvetica, sans-serif;
 }
