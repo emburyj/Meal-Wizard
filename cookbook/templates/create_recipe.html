@@ -40,11 +40,8 @@
                 <h3>Enter Ingredients:</h3>
             </div>
 
-
-                <h3>Ingredient &emsp; &emsp; Qty &emsp; Type</h3>
-
-
-            <div class="card-body">
+            <div class="card-body" style="font-family: Arial, Helvetica, sans-serif;">
+                <h3 class="large-list">Ingredient &emsp; &emsp; &emsp; &emsp; &emsp; Qty &emsp; &emsp; Type</h3>
                 {% for key, val in ingredients_form.items %}
                     <p>{{ val }}</p>
                 {% endfor %}

@@ -1,24 +1,33 @@
-{% extends "base.html" %}{% block content %}
+
+{% extends "base.html" %}
+{% block fullpage %}
 {% load crispy_forms_tags %}
-<h1>
-    <div class="content-section">
-        <form method="POST">
-            {% csrf_token %}
-            <fieldset class="form-group">
-                <legend class="border=bottom mb-4">Join Now</legend>
-                    {{ form|crispy }}
-            </fieldset>
-            <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Sign up</button>
-            </div>
-        </form>
-        <div class="border-top" pt-3>
-            <small class="text-muted">
-                Already have an account? <a class="ml-2" href="{% url 'login' %}">Sign In</a>
-            </small>
+
+<section class="vh-100 themeColor">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-3">
+        <div class="card shadow-2-strong" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center justify-content-center">
+            <h3 class="mb-5">Join Now</h3>
+                <form method="POST">
+                    <div class="form-group form-control">
+                        {% csrf_token %}
+                        {{ form }}
+                    </div>
+                    <button class="btn btn-primary-bg btn-lg btn-outline-dark mt-4" type="submit">Sign Up</button>
+                </form>
+            <hr class="my-4">
+
+                <small class="text-muted">
+                    Alrady have an account? <a class="ml-2 recipeLink" href="{% url 'login' %}">Sign In</a>
+                </small>
+
+          </div>
         </div>
+      </div>
     </div>
-</h1>
+  </div>
+</section>
 
-
-{% endblock content %}
+{% endblock %}

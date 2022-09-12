@@ -16,7 +16,7 @@ class Recipe(models.Model):
     rec_type = models.CharField(max_length=128)
     source = models.CharField(max_length=512)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return self.name

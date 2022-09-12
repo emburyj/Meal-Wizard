@@ -15,6 +15,12 @@ def register(request):
             form.save()
             username = form.cleaned_data.get('username')
             messages.success(request, f"Your account has been created! You are now able to log in!")
+            josh = User.objects.get(username='josh')
+            new_user = User.objects.get(username=username)
+            followed_by_josh = Follow(followed=new_user, follower=josh)
+            followed_by_josh.save()
+            following_josh = Follow(followed=josh, follower=new_user)
+            following_josh.save()
 
             return redirect('login')
         else:

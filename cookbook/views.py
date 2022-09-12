@@ -88,7 +88,7 @@ def create_recipe_view(response):
         del(ing_form.fields["ingred"])
         del(ing_form.fields["qty"])
         del(ing_form.fields["ing_type"])
-        for i in range(1, 10):
+        for i in range(1, 15):
             ing_form.fields[f"ingred{i}"] = ing_form.fields["ingred0"]
             ing_form.fields[f"qty{i}"] = ing_form.fields["qty0"]
             ing_form.fields[f"ing_type{i}"] = ing_form.fields["ing_type0"]
