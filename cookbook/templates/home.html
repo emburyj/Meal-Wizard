@@ -47,7 +47,7 @@
             {% for key, val in MP_Recs.items %}
             <div class="col align-self-center container-lg">
                 <a href="{% url 'mp_detail' key.rcid %}" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5">
-                    <h2>Meal Plan for week of {{ key.created_date }} - {{ key.author }}</h2>
+                    <h2>{{ key.author }}'s meals for week of {{ key.created_date }}</h2>
                         {% for item in val %}
                             <li>
                                 {{ item.name }}

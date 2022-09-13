@@ -1,9 +1,9 @@
 .themeColor {
-    background-color: #20B2AA;
+    background-color: #4682B4; /*4682B4*//*20B2AA*/
 }
 
 .backgroundColor {
-    background-color: #F5FFFA;
+    background-color: #F0F8FF;
 }
 
 a.userLink{
@@ -24,7 +24,7 @@ a.btn-primary-bg {
     border-radius: 50px;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    --bs-btn-hover-bg: #20B2AA;
+    --bs-btn-hover-bg: #4682B4;
 }
 
 button.btn-primary-bg {
@@ -32,7 +32,7 @@ button.btn-primary-bg {
     border-radius: 50px;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    --bs-btn-hover-bg: #20B2AA;
+    --bs-btn-hover-bg: #4682B4;
 }
 
 h1.font-extra-large {

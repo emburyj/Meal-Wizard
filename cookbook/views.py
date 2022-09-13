@@ -20,7 +20,7 @@ def home_view(request):
     current_user = request.user
     recs_all_q = get_recipes_following(current_user).order_by('-created_date')# query of all recipe objects of current user and everyone they're following
     recs_all_list = [x for x in recs_all_q]
-    rec_coll_query = RecipeCollection.objects.filter(author__exact=current_user).order_by('-created_date')
+    rec_coll_query = get_recipecollections_following(current_user).order_by('-created_date')
     mealplan_recipes = {}
     for item in rec_coll_query:
         rec_query = MealPlan.objects.filter(rec_col__exact=item)
@@ -198,3 +198,13 @@ def get_recipes_following(user):
     staple_strings = [f"{x.username}_staple_recipe" for x in following_list]
     recipes_following_query = Recipe.objects.filter(author__in=following_list).exclude(name__in=staple_strings)
     return recipes_following_query
+
+def get_recipecollections_following(user):
+
+    # get users that user is following
+    following_query = Follow.objects.filter(follower=user)
+    following_list = [x.followed for x in following_query]
+    following_list.append(user) # add user to get their recipecollections too
+    recipecollection_following_query = RecipeCollection.objects.filter(author__in=following_list)
+
+    return recipecollection_following_query

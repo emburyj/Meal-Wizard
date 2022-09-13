@@ -57,7 +57,7 @@
                         {% csrf_token %}
                         {{ follow_form }}
                         <div class="submit">
-                            <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #20B2AA; font-family: Arial, Helvetica, sans-serif;">
+                            <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #4682B4; font-family: Arial, Helvetica, sans-serif;">
                                 Unfollow
                             </button>
                         </div>
@@ -70,7 +70,7 @@
                         {% csrf_token %}
                         {{ follow_form }}
                         <div class="submit">
-                            <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #20B2AA; font-family: Arial, Helvetica, sans-serif;">
+                            <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #4682B4; font-family: Arial, Helvetica, sans-serif;">
                                 Follow
                             </button>
                         </div>
@@ -126,7 +126,7 @@
                         <h3>Enter Ingredients:</h3>
 
                     <p>
-                        <h3 class="large-list">Ingredient &emsp; &emsp; Qty &emsp; Type</h3>
+                        <h3 class="large-list">Ingredient &emsp; &emsp; &emsp; &emsp; &emsp; Qty &emsp; &emsp; Type</h3>
                     </p>
                     <p>
                         {% for key, val in ingredients_form.items %}
@@ -135,7 +135,7 @@
                     </p>
                 </div>
                 <div class="submit">
-                    <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #20B2AA; font-family: Arial, Helvetica, sans-serif;">Save Items</button>
+                    <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #4682B4; font-family: Arial, Helvetica, sans-serif;">Save Items</button>
                 </div>
             </form>
         </div>
