@@ -101,7 +101,7 @@ def create_recipe_view(response):
             if response.POST["recipe_source_link"]:
                 source = response.POST["recipe_source_link"]
             else:
-                source = ""
+                source = "#"
             new_recipe = Recipe(name=name, rec_type=rec_type, source=source, author=current_user)
             new_recipe.save()
 
