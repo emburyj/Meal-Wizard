@@ -7,7 +7,7 @@
         <!-- Card header start -->
         <div class="card-header pb-0 border-0" style="background-color:white;">
 
-            <a href="{% url 'grocery_shopping' rcid %}" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5">
+            <a href="{% url 'grocery_shopping' recipe_collection.rcid %}" class="btn btn-primary-bg btn-lg btn-outline-dark d-grid gap-2 px-5">
                 Switch to Shopping List View!
             </a>
 
@@ -30,6 +30,16 @@
     </a>
 </div>
 {% endfor %}
-
-
+{% if recipe_collection.author == user %}
+<div class="align-self-center">
+    <form method="post">
+        {% csrf_token %}
+        <div class="submit">
+            <button type="submit" class="btn btn-lg btn-outline-dark btn-delete" name="delete_RC_button" value="{{ recipe_collection.rcid }}">
+                Delete Meal Plan
+            </button>
+        </div>
+    </form>
+</div>
+{% endif %}
 {% endblock %}

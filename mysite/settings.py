@@ -86,6 +86,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# development db:
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
@@ -93,6 +95,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #         # 'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+# production db:
 
 DATABASES = {
     'default': dj_database_url.config(

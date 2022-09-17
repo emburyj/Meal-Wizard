@@ -96,10 +96,25 @@
             </h2>
         </div>
         <div class="card-body">
-            {% for recipe in user_recipes %}
-                <li>
-                    <a class="recipeLink" href="{{ recipe.source }}">{{ recipe.name }}</a>, added on {{ recipe.created_date }}
-                </li>
+            {% for recipe, rec_delform in user_recipes_delform.items %}
+                <p>
+                    <li style="display:inline-block">
+                        <a class="recipeLink" href="{{ recipe.source }}">{{ recipe.name }}</a>, added on {{ recipe.created_date }}
+                    </li>
+                        {% if displayed_user == user %}
+                        <div style="display:inline-block">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    {{ rec_delform }}
+                                    <div class="submit">
+                                        <button type="submit" class="btn btn-sm btn-outline-dark btn-delete" name="delete_recipe_button" value="{{ recipe.rid }}">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </p>
             {% endfor %}
         </div>
     </div>

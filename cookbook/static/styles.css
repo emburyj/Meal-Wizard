@@ -35,6 +35,12 @@ button.btn-primary-bg {
     --bs-btn-hover-bg: #4682B4;
 }
 
+button.btn-delete {
+    --bs-btn-bg:#B22222;
+    font-family: Arial, Helvetica, sans-serif;
+    border-radius: 10px;
+}
+
 h1.font-extra-large {
     font-size: 100%;
 }

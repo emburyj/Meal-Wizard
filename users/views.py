@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime as dt
 from cookbook.models import *
 from users.models import *
-from cookbook.forms import new_recipe_ingredients_form, ing_type_choices, rec_type_choices
+from cookbook.forms import new_recipe_ingredients_form, ing_type_choices, rec_type_choices, DeleteButtonForm
 
 def register(request):
     if request.method == "POST":
@@ -44,6 +44,13 @@ def profile_view(request, username):
                     new_follow = Follow(followed=displayed_user, follower=current_user)
                     new_follow.save()
                 return HttpResponseRedirect(f"/Profile/{displayed_user.username}")
+        # -------------------------------------------------- #  Delete recipe form stuff
+        if request.POST['delete_recipe_button']:
+            rid_delete = request.POST['delete_recipe_button']
+            recipe_to_delete = Recipe.objects.get(rid=rid_delete)
+
+            recipe_to_delete.delete()
+            return HttpResponseRedirect(f"/Profile/{displayed_user.username}")
 
         # -------------------------------------------------- #  Staple ingredient form stuff
         ing_form = new_recipe_ingredients_form(request.POST)
@@ -89,7 +96,7 @@ def profile_view(request, username):
             return HttpResponseRedirect(f"/Profile/{request.user.username}")
         # -------------------------------------------------- #
 
-    else:
+    else: #get request:
         # follow form stuff
         followers_query = Follow.objects.filter(followed=displayed_user)
         followers_list = [x.follower for x in followers_query]
@@ -105,8 +112,18 @@ def profile_view(request, username):
         # date displayed user joined
         date_joined = dt.date(displayed_user.date_joined)
         # all recipes created by displayed user:
-        user_recipes = Recipe.objects.filter(author=displayed_user).exclude(name__exact=f"{displayed_user.username}_staple_recipe") # will need to filter with an exclude for staples..
-        # staple ingredient sutff:
+        user_recipes = Recipe.objects.filter(author=displayed_user).exclude(name__exact=f"{displayed_user.username}_staple_recipe") # query for al recs by user except staple recipe
+
+        #delete recipe button forms
+        user_recipe_list = [x for x in user_recipes]
+        recs_recsdel_form = {}
+        for i in range(0, len(user_recipes)):
+            del_button = DeleteButtonForm()
+            del_button.fields[f'delete_button_{i}'] = del_button.fields['delete_button']
+            del(del_button.fields['delete_button'])
+            recs_recsdel_form.setdefault(user_recipes[i], del_button) # dict with {recipe: delete form for recipe}
+
+        # staple ingredient form sutff:
         ing_form = {}
         for i in range(0, 10):
             ingredients_form = new_recipe_ingredients_form()
@@ -119,7 +136,8 @@ def profile_view(request, username):
             ing_form.setdefault(i, ingredients_form)
 
         context = {'displayed_user': displayed_user, 'date_joined': date_joined,
-         'user_recipes': user_recipes, 'ingredients_form': ing_form,
+         'user_recipes_delform': recs_recsdel_form, 'ingredients_form': ing_form,
          'follow': following, 'follow_form': follow_form,
-         'followers': followers_list, 'following': following_list}
+         'followers': followers_list, 'following': following_list,}
+         #working on dellete recipes form; probably need to combine user_recipes with del recipe form to traverse over both of these in template
     return render(request, 'users/profile.html', context)

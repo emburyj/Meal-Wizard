@@ -18,9 +18,9 @@ def home_view(request):
     # all_users_q = User.objects.all()
     # all_users = [x for x in all_users_q]
     current_user = request.user
-    recs_all_q = get_recipes_following(current_user).order_by('-created_date')# query of all recipe objects of current user and everyone they're following
+    recs_all_q = get_recipes_following(current_user).order_by('-created_date')[:10]# query of all recipe objects of current user and everyone they're following; limit to 10
     recs_all_list = [x for x in recs_all_q]
-    rec_coll_query = get_recipecollections_following(current_user).order_by('-created_date')
+    rec_coll_query = get_recipecollections_following(current_user).order_by('-created_date')[:20] # limit to 20 MP's
     mealplan_recipes = {}
     for item in rec_coll_query:
         rec_query = MealPlan.objects.filter(rec_col__exact=item)
@@ -61,12 +61,19 @@ def create_meal_plan_view(response):
 
 @login_required
 def meal_plan_detail_view(request, rcid):
-    rc = RecipeCollection.objects.get(pk=rcid) # this gives you the RC object
-    meal_plan_q = MealPlan.objects.filter(rec_col__exact=rc) # this gives a query obj
-    recs = [item.rid for item in meal_plan_q]
-    recs_ings = get_recs_ings(recs)
-    context = {'recipes_ingredients': recs_ings, 'rcid': rcid}
-    return render(request, 'mp_detail.html', context)
+    if request.method == "POST":
+        if request.POST['delete_RC_button']:
+            rc_to_delete = RecipeCollection.objects.get(rcid=request.POST['delete_RC_button'])
+            rc_to_delete.delete()
+            return HttpResponseRedirect("/")
+
+    else:
+        rc = RecipeCollection.objects.get(pk=rcid) # this gives you the RC object
+        meal_plan_q = MealPlan.objects.filter(rec_col__exact=rc) # this gives a query obj
+        recs = [item.rid for item in meal_plan_q]
+        recs_ings = get_recs_ings(recs)
+        context = {'recipes_ingredients': recs_ings, 'recipe_collection': rc}
+        return render(request, 'mp_detail.html', context)
 
 @login_required
 def grocery_list_view(request, rcid):

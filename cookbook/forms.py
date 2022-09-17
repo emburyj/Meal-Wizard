@@ -1,7 +1,7 @@
 from django import forms
 
-from django.contrib.admin.widgets import AdminDateWidget
 from datetime import datetime
+from django.forms import HiddenInput
 
 # class MyButtonInput(forms.widgets.CheckboxInput):
 #     input_type = 'button'
@@ -32,3 +32,6 @@ class new_recipe_ingredients_form(forms.Form):
     ingred = forms.CharField(label="", max_length=128, required=False)
     qty = forms.IntegerField(label="", min_value=0, max_value=10, required=False)
     ing_type = forms.ChoiceField(label = "", choices=ing_type_choices, required=False)
+
+class DeleteButtonForm(forms.Form):
+    delete_button = forms.BooleanField(widget=HiddenInput(), required=False, initial=True)
