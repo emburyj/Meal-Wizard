@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime as dt
 from cookbook.models import *
 from users.models import *
-from cookbook.forms import new_recipe_ingredients_form, ing_type_choices, rec_type_choices, DeleteButtonForm
+from cookbook.forms import new_recipe_ingredients_form, ing_type_choices, rec_type_choices, DeleteButtonForm, WizardRecipe
 
 def register(request):
     if request.method == "POST":
@@ -21,6 +21,12 @@ def register(request):
             followed_by_josh.save()
             following_josh = Follow(followed=josh, follower=new_user)
             following_josh.save()
+            wizard_recipe = Recipe(name=f"{username}_wizard_recipe", rec_type="Other", source="#", author=new_user)
+            wizard_recipe.save()
+            wizard_ingredient = Ingredient(name=f"{username}_wizard_ingredient",ing_type="Other")
+            wizard_ingredient.save()
+            wizard_cookbook = Cookbook(rec=wizard_recipe, ing=wizard_ingredient, qty=5)
+            wizard_cookbook.save()
 
             return redirect('login')
         else:
@@ -45,12 +51,22 @@ def profile_view(request, username):
                     new_follow.save()
                 return HttpResponseRedirect(f"/Profile/{displayed_user.username}")
         # -------------------------------------------------- #  Delete recipe form stuff
-        if request.POST['delete_recipe_button']:
+        if 'delete_recipe_button' in request.POST.keys():
             rid_delete = request.POST['delete_recipe_button']
             recipe_to_delete = Recipe.objects.get(rid=rid_delete)
 
             recipe_to_delete.delete()
             return HttpResponseRedirect(f"/Profile/{displayed_user.username}")
+        # -------------------------------------------------- #  Wizard recipe creation- recipe qty, implemented as an ingredient.
+        if 'wizard_qty_button' in request.POST.keys():
+            wizard_recipe_form = WizardRecipe(request.POST)
+            if wizard_recipe_form.is_valid():
+                if wizard_recipe_form.cleaned_data['qty']:
+                    # check if user has set this previously, if so overwrite
+                    wizard_recipe = Recipe.objects.get(name=f"{current_user}_wizard_recipe")
+                    wizard_ingredient = Ingredient.objects.get(name=f"{current_user}_wizard_ingredient")
+                    Cookbook.objects.get(rec=wizard_recipe).delete()
+                    Cookbook(rec=wizard_recipe, ing=wizard_ingredient, qty=wizard_recipe_form.cleaned_data['qty']).save()
 
         # -------------------------------------------------- #  Staple ingredient form stuff
         ing_form = new_recipe_ingredients_form(request.POST)
@@ -113,7 +129,7 @@ def profile_view(request, username):
         date_joined = dt.date(displayed_user.date_joined)
         # all recipes created by displayed user:
         user_recipes = Recipe.objects.filter(author=displayed_user).exclude(name__exact=f"{displayed_user.username}_staple_recipe") # query for al recs by user except staple recipe
-
+        user_recipes = user_recipes.exclude(name__exact=f"{displayed_user.username}_wizard_recipe")
         #delete recipe button forms
         user_recipe_list = [x for x in user_recipes]
         recs_recsdel_form = {}
@@ -122,6 +138,9 @@ def profile_view(request, username):
             del_button.fields[f'delete_button_{i}'] = del_button.fields['delete_button']
             del(del_button.fields['delete_button'])
             recs_recsdel_form.setdefault(user_recipes[i], del_button) # dict with {recipe: delete form for recipe}
+
+        # form for wizard recipe default
+        wizard_qty_form = WizardRecipe()
 
         # staple ingredient form sutff:
         ing_form = {}
@@ -138,6 +157,7 @@ def profile_view(request, username):
         context = {'displayed_user': displayed_user, 'date_joined': date_joined,
          'user_recipes_delform': recs_recsdel_form, 'ingredients_form': ing_form,
          'follow': following, 'follow_form': follow_form,
-         'followers': followers_list, 'following': following_list,}
+         'followers': followers_list, 'following': following_list,
+         'wizard_qty_form': wizard_qty_form,}
          #working on dellete recipes form; probably need to combine user_recipes with del recipe form to traverse over both of these in template
     return render(request, 'users/profile.html', context)

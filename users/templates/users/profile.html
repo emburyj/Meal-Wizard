@@ -106,7 +106,7 @@
                                 <form method="post">
                                     {% csrf_token %}
                                     {{ rec_delform }}
-                                    <div class="submit">
+                                    <div>
                                         <button type="submit" class="btn btn-sm btn-outline-dark btn-delete" name="delete_recipe_button" value="{{ recipe.rid }}">
                                             Delete
                                         </button>
@@ -118,6 +118,37 @@
             {% endfor %}
         </div>
     </div>
+
+{% comment %}
+    ---------------------------------------------------------------------------------------
+                             Div for Wizard setting - num of recipes in MP
+{% endcomment %}
+{% if displayed_user == user %}
+    <div class="card mt-4">
+        <div class="card-header pb-0 border-0" style="background-color:white;">
+            <h2>
+                Meal Wizard Settings
+            </h2>
+        </div>
+        <div class="card-body">
+            <h5>
+                When you use the Meal Wizard to generate your meal plan, configure the number of recipes you'd like added.
+            </h5>
+            <form method="POST">
+                <div style="display:inline-block">
+                    {% csrf_token %}
+                    {{ wizard_qty_form }}
+
+                    <button type="submit" class="btn btn-sm btn-outline-dark" style="--bs-btn-bg: #4682B4; font-family: Arial, Helvetica, sans-serif;"
+                     name="wizard_qty_button" value="1">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endif %}
+
 
 {% comment %}
     ---------------------------------------------------------------------------------------
@@ -149,7 +180,7 @@
                         {% endfor %}
                     </p>
                 </div>
-                <div class="submit">
+                <div>
                     <button type="submit" class="btn btn-lg btn-outline-dark" style="--bs-btn-bg: #4682B4; font-family: Arial, Helvetica, sans-serif;">Save Items</button>
                 </div>
             </form>

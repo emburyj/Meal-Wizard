@@ -35,3 +35,6 @@ class new_recipe_ingredients_form(forms.Form):
 
 class DeleteButtonForm(forms.Form):
     delete_button = forms.BooleanField(widget=HiddenInput(), required=False, initial=True)
+
+class WizardRecipe(forms.Form):
+    qty = forms.IntegerField(label="Number of Recipes", min_value=1, max_value=10, required=False)

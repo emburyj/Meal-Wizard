@@ -9,6 +9,7 @@ from collections import OrderedDict
 from cookbook.forms import rec_type_choices
 from cookbook.forms import ing_type_choices
 from users.models import *
+import random
 
 # --------------------------------------------------------------------------------------#
 # Views
@@ -40,10 +41,31 @@ def create_meal_plan_view(response):
         start_date = parse_date(response.POST['date'])
         new_rc_obj = RecipeCollection(author=current_user, created_date=start_date)
         new_rc_obj.save()
-        for i in range(0, len(recs_all)):
-            if recs_all[i].name in response.POST:
-                    new_mp = MealPlan(rec_col=new_rc_obj ,rid=recs_all[i])
-                    new_mp.save()
+        if 'wizard_creation' in response.POST.keys():
+            user_wizard_recipe = Recipe.objects.get(name=f"{current_user}_wizard_recipe")
+            user_wizard_qty = Cookbook.objects.get(rec=user_wizard_recipe)
+            num_wizard_mp = user_wizard_qty.qty
+            # get some random integers
+            if num_wizard_mp > len(recs_all):
+                num_wizard_mp = len(recs_all)
+            random_indices = []
+            for i in range(0, num_wizard_mp):
+                while(True):
+                    current_rand = random.randrange(0, len(recs_all))
+                    if current_rand in random_indices: # no duplicates
+                        pass
+                    else:
+                        random_indices.append(current_rand)
+                        break
+                current_wizard_recipe = recs_all[random_indices[i]]
+
+                new_mp = MealPlan(rec_col=new_rc_obj ,rid=current_wizard_recipe)
+                new_mp.save()
+        else:
+            for i in range(0, len(recs_all)):
+                if recs_all[i].name in response.POST:
+                        new_mp = MealPlan(rec_col=new_rc_obj ,rid=recs_all[i])
+                        new_mp.save()
         return HttpResponseRedirect(f"/Meal-Plans/{new_rc_obj.rcid}")
     else:
         dateform = new_rc_date_form()
@@ -62,7 +84,7 @@ def create_meal_plan_view(response):
 @login_required
 def meal_plan_detail_view(request, rcid):
     if request.method == "POST":
-        if request.POST['delete_RC_button']:
+        if 'delete_RC_button' in request.POST.keys():
             rc_to_delete = RecipeCollection.objects.get(rcid=request.POST['delete_RC_button'])
             rc_to_delete.delete()
             return HttpResponseRedirect("/")
@@ -203,7 +225,9 @@ def get_recipes_following(user):
     following_list.append(user) # add user to get their recipes too
     # get recipes authored by these users
     staple_strings = [f"{x.username}_staple_recipe" for x in following_list]
+    wizard_strings = [f"{x.username}_wizard_recipe" for x in following_list]
     recipes_following_query = Recipe.objects.filter(author__in=following_list).exclude(name__in=staple_strings)
+    recipes_following_query = recipes_following_query.exclude(name__in=wizard_strings)
     return recipes_following_query
 
 def get_recipecollections_following(user):
