@@ -17,23 +17,23 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# IS_HEROKU = "DYNO" in os.environ
-# if IS_HEROKU:
-#     ALLOWED_HOSTS = ['*']
-# else:
-ALLOWED_HOSTS = []
+IS_HEROKU = "DYNO" in os.environ
+if IS_HEROKU:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = []
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 SECRET_KEY = config('SECRET_KEY')
 
-# SECURE_SSL_REDIRECT = True
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 
-DEBUG = True
+DEBUG = False
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
@@ -88,21 +88,21 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # development db:
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mysite.db',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': 'mysite.db',
+#         # 'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # production db:
 
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
-#     )
-# }
+DATABASES = {
+    'default': dj_database_url.config(
+        default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
+    )
+}
 
 
 # Password validation
